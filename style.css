@@ -1460,3 +1460,24 @@ body.hacking {
   .hero .timer-unit b { font-size: 0.85rem; }
   .hero .timer-unit i { font-size: 0.6rem; }
 }
+/* ---------- ПОРЯДОК ЭЛЕМЕНТОВ В HERO НА ТЕЛЕФОНЕ ---------- */
+@media (max-width: 700px) {
+  .hero .hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero .hero-content .animated-title { order: 1; }
+  .hero .hero-content > p              { order: 2; }   /* РОССИЙСКИЙ РЭП-ИСПОЛНИТЕЛЬ */
+  .hero .hero-content .btn             { order: 3; }   /* Слушать */
+  .hero .hero-content .release-timer   { order: 4; }   /* таймер внизу */
+
+  /* отступы, чтобы не слипалось */
+  .hero .hero-content > p {
+    margin-bottom: 22px;
+  }
+  .hero .hero-content .release-timer {
+    margin: 22px auto 0;
+  }
+}
