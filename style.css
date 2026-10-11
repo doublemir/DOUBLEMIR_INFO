@@ -1374,3 +1374,89 @@ body.hacking {
     0 0 40px rgba(0, 255, 65, 0.5);
   font-family: 'Courier New', monospace;
 }
+/* =========================================
+   ТАЙМЕР ДО РЕЛИЗА — под заголовком в hero
+   ========================================= */
+.hero .release-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 auto 32px;
+  padding: 9px 22px;
+  border: 1px solid rgba(200, 255, 0, 0.35);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: 'Unbounded', sans-serif;
+  color: #c8ff00;
+  letter-spacing: 1px;
+  line-height: 1;
+  animation: heroTimerGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes heroTimerGlow {
+  from { box-shadow: 0 0 0 rgba(200, 255, 0, 0); }
+  to   { box-shadow: 0 0 26px rgba(200, 255, 0, 0.35); }
+}
+
+.hero .release-timer-label {
+  font-size: 0.68rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.release-timer-sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(200, 255, 0, 0.35);
+}
+
+.hero .timer-unit {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero .timer-unit b {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(200, 255, 0, 0.5);
+}
+
+.hero .timer-unit i {
+  font-style: normal;
+  font-size: 0.68rem;
+  opacity: 0.7;
+  color: #c8ff00;
+}
+
+/* момент релиза */
+.hero .release-timer.released {
+  border-color: rgba(200, 255, 0, 0.95);
+  background: rgba(200, 255, 0, 0.12);
+  animation: heroTimerGlow 1s ease-in-out infinite alternate;
+}
+
+/* ---------- мобильная версия ---------- */
+@media (max-width: 700px) {
+  .hero .release-timer {
+    gap: 8px;
+    padding: 8px 16px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .hero .release-timer-label {
+    font-size: 0.58rem;
+    letter-spacing: 2px;
+    width: 100%;
+    text-align: center;
+  }
+  .release-timer-sep { display: none; }
+  .hero .timer-unit b { font-size: 0.85rem; }
+  .hero .timer-unit i { font-size: 0.6rem; }
+}
