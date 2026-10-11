@@ -1468,16 +1468,16 @@ body.hacking {
     align-items: center;
   }
 
-  .hero .hero-content .animated-title { order: 1; }
+  .hero .hero-content .animated-title { order: 1; }   /* DOUBLEMIR */
   .hero .hero-content > p              { order: 2; }   /* РОССИЙСКИЙ РЭП-ИСПОЛНИТЕЛЬ */
-  .hero .hero-content .btn             { order: 3; }   /* Слушать */
-  .hero .hero-content .release-timer   { order: 4; }   /* таймер внизу */
+  .hero .hero-content .release-timer   { order: 3; }   /* таймер */
+  .hero .hero-content .btn             { order: 4; }   /* Слушать */
 
   /* отступы, чтобы не слипалось */
   .hero .hero-content > p {
-    margin-bottom: 22px;
+    margin-bottom: 18px;
   }
   .hero .hero-content .release-timer {
-    margin: 22px auto 0;
+    margin: 0 auto 22px;
   }
 }
