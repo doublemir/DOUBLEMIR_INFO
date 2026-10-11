@@ -74,6 +74,16 @@
       <span style="--i:7">I</span>
       <span style="--i:8">R</span>
     </h1>
+
+    <!-- ТАЙМЕР ДО РЕЛИЗА -->
+    <div class="release-timer" id="releaseTimer">
+      <span class="release-timer-label">До релиза · 16.10</span>
+      <span class="release-timer-sep"></span>
+      <span class="timer-unit"><b id="tDays">00</b><i>д</i></span>
+      <span class="timer-unit"><b id="tHours">00</b><i>ч</i></span>
+      <span class="timer-unit"><b id="tMinutes">00</b><i>м</i></span>
+      <span class="timer-unit"><b id="tSeconds">00</b><i>с</i></span>
+    </div>
     <p>Российский рэп-исполнитель</p>
     <a href="music.html" class="btn">Слушать</a>
   </div>
@@ -701,6 +711,53 @@
       active = false;
     }, 2500);
   }
+})();
+</script>
+<script>
+/* ---------- ТАЙМЕР ДО РЕЛИЗА ---------- */
+(function () {
+  const wrap = document.getElementById('releaseTimer');
+  if (!wrap) return;
+
+  const dEl = document.getElementById('tDays');
+  const hEl = document.getElementById('tHours');
+  const mEl = document.getElementById('tMinutes');
+  const sEl = document.getElementById('tSeconds');
+
+  function getReleaseDate() {
+    const now = new Date();
+    let year = now.getFullYear();
+    let target = new Date(year, 9, 16, 0, 0, 0);
+    if (target.getTime() <= now.getTime()) {
+      target = new Date(year + 1, 9, 16, 0, 0, 0);
+    }
+    return target;
+  }
+
+  let releaseDate = getReleaseDate();
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function tick() {
+    const diff = releaseDate.getTime() - Date.now();
+
+    if (diff <= 0) {
+      wrap.classList.add('released');
+      const lbl = wrap.querySelector('.release-timer-label');
+      if (lbl) lbl.textContent = 'Релиз уже здесь!';
+      dEl.textContent = hEl.textContent = mEl.textContent = sEl.textContent = '00';
+      clearInterval(timerId);
+      return;
+    }
+
+    dEl.textContent = pad(Math.floor(diff / 86400000));
+    hEl.textContent = pad(Math.floor((diff % 86400000) / 3600000));
+    mEl.textContent = pad(Math.floor((diff % 3600000) / 60000));
+    sEl.textContent = pad(Math.floor((diff % 60000) / 1000));
+  }
+
+  let timerId = setInterval(tick, 1000);
+  tick();
 })();
 </script>
 </body>
