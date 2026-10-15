@@ -1481,3 +1481,32 @@ body.hacking {
     margin: 0 auto 22px;
   }
 }
+/* ---------- ФИНАЛЬНЫЙ БЕЙДЖ ---------- */
+.release-timer.released {
+  padding: 0 !important;
+  border-color: rgba(200, 255, 0, 0.9) !important;
+  background: rgba(200, 255, 0, 0.1) !important;
+  animation: heroTimerGlow 1.4s ease-in-out infinite alternate;
+}
+
+.release-out-now {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 26px;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #c8ff00;
+  border-radius: 999px;
+}
+
+@media (max-width: 700px) {
+  .release-out-now {
+    padding: 8px 16px;
+    font-size: 0.58rem;
+    letter-spacing: 1.5px;
+    text-align: center;
+    line-height: 1.4;
+  }
+}
