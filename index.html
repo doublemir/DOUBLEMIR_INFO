@@ -76,16 +76,11 @@
     </h1>
 
     <!-- ТАЙМЕР ДО РЕЛИЗА -->
-    <div class="release-timer" id="releaseTimer">
-      <span class="release-timer-label">До релиза · 16.10</span>
-      <span class="release-timer-sep"></span>
-      <span class="timer-unit"><b id="tDays">00</b><i>д</i></span>
-      <span class="timer-unit"><b id="tHours">00</b><i>ч</i></span>
-      <span class="timer-unit"><b id="tMinutes">00</b><i>м</i></span>
-      <span class="timer-unit"><b id="tSeconds">00</b><i>с</i></span>
-    </div>
+   <div class="release-timer released" id="releaseTimer">
+  <span class="release-out-now">SEE YOU SOON · НОВЫЙ РЕЛИЗ СКОРО</span>
+</div>
     <p>Российский рэп-исполнитель</p>
-    <a href="music.html" class="btn">Слушать</a>
+    <a href="music.html" class="btn">Слушать</a>   
   </div>
 </section>
 
@@ -511,52 +506,80 @@
     });
   });
 
-  /* ---------- ПОДЕЛИТЬСЯ ТРЕКОМ ---------- */
-  function shareTrack(trackName) {
-    const anchorMap = {
-      'Наебал': 'naebal',
-      'Пантера': 'pantera',
-      'Похуй ваще': 'pohuy-vashe',
-      'Секс по телефону': 'sex-phone',
-      'Bad Star': 'bad-star',
-      'YMIP feat. DOUBLEMIR — only SEX': 'only-sex',
-      'W double, DOUBLEMIR — clean girl': 'clean-girl',
-      'DOUBLEMIR, PLOHOYTARASIK — PROJECT X': 'project-x',
-      'DOUBLEMIR feat. stepanenko — Взгляды под луной': 'vzglyady',
-      'Лабубу': 'labubu',
-      'Жизнь моя': 'zhizn-moya',
-      'Будешь со мной': 'budes-so-mnoy',
-      'Боль': 'bol',
-      'Блондинка': 'blondinka',
-      'АйАйАй': 'ay-ay-ay',
-      '2026': '2026'
-    };
-    const anchor = anchorMap[trackName] || '';
-    const baseUrl = window.location.origin + window.location.pathname;
-    const url = anchor ? baseUrl + '#' + anchor : baseUrl;
-    const text = 'Слушай «' + trackName + '» — DOUBLEMIR INFO';
-    const fullText = text + '\n' + url;
 
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const isYandex = /YaBrowser/i.test(navigator.userAgent);
-    if (isMobile && !isYandex && navigator.share) {
-      navigator.share({
-        title: 'DOUBLEMIR INFO — ' + trackName,
-        text: text,
-        url: url
-      }).catch(() => {});
-      return;
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(fullText).then(() => {
-        showCopied(trackName);
-      }).catch(() => {
-        fallbackCopy(fullText, trackName);
-      });
-      return;
-    }
-    fallbackCopy(fullText, trackName);
+/* ---------- ПОДЕЛИТЬСЯ ТРЕКОМ ---------- */
+function shareTrack(trackName) {
+  const anchorMap = {
+    // ---------- ВРЕМЯ ПОКАЖЕТ!!! (EP) ----------
+    'Девочка мечты(intro)': 'devochka-mechty',
+    'Мне похуй':            'mne-poxyi',
+    'Pull Up':              'pull-up',
+    'Егермейстер':          'jagermeister',
+    'Доля правды':          'dolya-pravdy',
+
+    // ---------- REALLY BASTARD (SoundCloud EP) ----------
+    'Наебал':               'naebal',
+    'Пантера':              'pantera',
+    'Похуй ваще':           'pohuy-vashe',
+    'Секс по телефону':     'sex-phone',
+    'Bad Star':             'bad-star',
+
+    // ---------- "17" (альбом) ----------
+    'Влиятельный':          'vliyatelny',
+    'Треп хата':            'trap-hata',
+    'Yau':                  'yau',
+    'HAHAHA':               'hahaha',
+    'USA MONEY':            'usa-money',
+    'МОДЕЛЬ':               'model',
+    'Флоронсе':             'floronce',
+    'Это я':                'eto-ya',
+    'Bonus':                'bonus',
+    'Точка':                'tochka',
+
+    // ---------- СИНГЛЫ ----------
+    'Стерва':                                       'sterva',
+    'YMIP feat. DOUBLEMIR — only SEX':              'only-sex',
+    'W double, DOUBLEMIR — clean girl':             'clean-girl',
+    'DOUBLEMIR, PLOHOYTARASIK — PROJECT X':         'project-x',
+    'DOUBLEMIR feat. stepanenko — Взгляды под луной':'vzglyady',
+    'Лабубу':                                       'labubu',
+    'Жизнь моя':                                    'zhizn-moya',
+    'Будешь со мной':                               'budes-so-mnoy',
+    'Боль':                                         'bol',
+    'Блондинка':                                    'blondinka',
+    'АйАйАй':                                       'ay-ay-ay',
+    '2026':                                         '2026'
+  };
+
+  const anchor = anchorMap[trackName] || '';
+  const baseUrl = window.location.origin + '/music.html';
+  const url = anchor ? baseUrl + '#' + anchor : baseUrl;
+  const text = 'Слушай «' + trackName + '» — DOUBLEMIR INFO';
+  const fullText = text + '\n' + url;
+
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isYandex = /YaBrowser/i.test(navigator.userAgent);
+
+  if (isMobile && !isYandex && navigator.share) {
+    navigator.share({
+      title: 'DOUBLEMIR INFO — ' + trackName,
+      text: text,
+      url: url
+    }).catch(() => {});
+    return;
   }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(fullText).then(() => {
+      showCopied(trackName);
+    }).catch(() => {
+      fallbackCopy(fullText, trackName);
+    });
+    return;
+  }
+
+  fallbackCopy(fullText, trackName);
+}
 
   function showCopied(trackName) {
     const buttons = document.querySelectorAll('.share-btn');
@@ -714,6 +737,7 @@
 })();
 </script>
 <script>
+<script>
 /* ---------- ТАЙМЕР ДО РЕЛИЗА ---------- */
 (function () {
   const wrap = document.getElementById('releaseTimer');
@@ -738,15 +762,19 @@
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
+  // Показываем финальную надпись вместо отсчёта
+  function showReleased() {
+    clearInterval(timerId);
+    wrap.classList.add('released');
+    wrap.innerHTML =
+      '<span class="release-out-now">SEE YOU SOON · НОВЫЙ РЕЛИЗ СКОРО</span>';
+  }
+
   function tick() {
     const diff = releaseDate.getTime() - Date.now();
 
     if (diff <= 0) {
-      wrap.classList.add('released');
-      const lbl = wrap.querySelector('.release-timer-label');
-      if (lbl) lbl.textContent = 'Релиз уже здесь!';
-      dEl.textContent = hEl.textContent = mEl.textContent = sEl.textContent = '00';
-      clearInterval(timerId);
+      showReleased();
       return;
     }
 
