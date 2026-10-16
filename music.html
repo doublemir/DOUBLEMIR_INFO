@@ -252,7 +252,7 @@
       </div>
     </div>
  <div class="tracklist">
-      <div class="track" id="sterva">
+      <div class="track" id="sterva" data-cover="imgsingles/sterva.jpg">
         <p class="track-title">DOUBLEMIR — Стерва <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="sterva"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
@@ -622,54 +622,110 @@ getAllTracks().forEach(track => {
     if (btn) btn.classList.remove('active');
   });
 });
-/* ---------- МЕТАДАННЫЕ ДЛЯ CONTROL CENTER / LOCK SCREEN ---------- */
+/* ---------- МЕТАДАННЫЕ + СИНХРОНИЗАЦИЯ ДЛЯ CONTROL CENTER / LOCK SCREEN ---------- */
 (function () {
   if (!('mediaSession' in navigator)) return;
 
   function updateMediaSession(track) {
-    const title = track.querySelector('.track-title');
+    const titleEl = track.querySelector('.track-title');
     const audio = track.querySelector('audio');
     if (!audio) return;
 
     let coverUrl = '';
 
     // 1. Индивидуальная обложка трека
-    const individualCover = track.dataset.cover;
-    if (individualCover) {
-      coverUrl = new URL(individualCover, window.location.href).href;
+    if (track.dataset.cover) {
+      coverUrl = new URL(track.dataset.cover, window.location.href).href;
     } else {
       // 2. Обложка альбома
       const albumBlock = track.closest('.album-block');
       if (albumBlock) {
         const coverImg = albumBlock.querySelector('.album-header-cover img');
-        if (coverImg) {
-          coverUrl = new URL(coverImg.src, window.location.href).href;
-        }
+        if (coverImg && coverImg.src) coverUrl = coverImg.src;
       }
     }
 
-    let titleText = 'DOUBLEMIR';
-    if (title) {
-      titleText = title.textContent.replace(/\s*E\s*$/, '').trim();
+    // Страховка от пробелов и скобок
+    if (coverUrl) {
+      try { coverUrl = encodeURI(decodeURI(coverUrl)); } catch (e) {}
     }
+
+    let titleText = 'DOUBLEMIR';
+    if (titleEl) titleText = titleEl.textContent.replace(/\s*E\s*$/, '').trim();
 
     navigator.mediaSession.metadata = new MediaMetadata({
       title: titleText,
       artist: 'DOUBLEMIR INFO',
       album: 'DOUBLEMIR INFO',
       artwork: coverUrl ? [
-        { src: coverUrl, sizes: '512x512', type: 'image/jpeg' },
-        { src: coverUrl, sizes: '1000x1000', type: 'image/jpeg' }
+        { src: coverUrl, sizes: '96x96',   type: 'image/jpeg' },
+        { src: coverUrl, sizes: '128x128', type: 'image/jpeg' },
+        { src: coverUrl, sizes: '192x192', type: 'image/jpeg' },
+        { src: coverUrl, sizes: '256x256', type: 'image/jpeg' },
+        { src: coverUrl, sizes: '384x384', type: 'image/jpeg' },
+        { src: coverUrl, sizes: '512x512', type: 'image/jpeg' }
       ] : []
     });
+
+    // --- Кнопки в системном плеере ---
+    try {
+      navigator.mediaSession.setActionHandler('play',  () => audio.play());
+      navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+      navigator.mediaSession.setActionHandler('stop',  () => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+      navigator.mediaSession.setActionHandler('seekbackward', (d) => {
+        audio.currentTime = Math.max(0, audio.currentTime - (d.seekOffset || 10));
+      });
+      navigator.mediaSession.setActionHandler('seekforward', (d) => {
+        audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + (d.seekOffset || 10));
+      });
+      navigator.mediaSession.setActionHandler('seekto', (d) => {
+        if (d.seekTime != null) audio.currentTime = d.seekTime;
+      });
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        const all = [...document.querySelectorAll('.track')];
+        const i = all.indexOf(track);
+        if (i > 0) all[i - 1].querySelector('audio')?.play();
+      });
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        const all = [...document.querySelectorAll('.track')];
+        const i = all.indexOf(track);
+        if (i < all.length - 1) all[i + 1].querySelector('audio')?.play();
+      });
+    } catch (e) {}
+
+    // --- Синхронизация play/pause и позиции ---
+    function syncState() {
+      navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
+    }
+    function syncPosition() {
+      if (!('setPositionState' in navigator.mediaSession)) return;
+      if (!audio.duration || !isFinite(audio.duration)) return;
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: audio.duration,
+          playbackRate: audio.playbackRate,
+          position: Math.min(audio.currentTime, audio.duration)
+        });
+      } catch (e) {}
+    }
+
+    audio.addEventListener('play',  syncState);
+    audio.addEventListener('pause', syncState);
+    audio.addEventListener('timeupdate', syncPosition);
+    audio.addEventListener('seeked', syncPosition);
+    audio.addEventListener('ended', syncState);
+
+    syncState();
+    syncPosition();
   }
 
   document.querySelectorAll('.track').forEach(track => {
     const audio = track.querySelector('audio');
     if (!audio) return;
-    audio.addEventListener('play', () => {
-      updateMediaSession(track);
-    });
+    audio.addEventListener('play', () => updateMediaSession(track));
   });
 })();
 
