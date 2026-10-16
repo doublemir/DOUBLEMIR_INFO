@@ -718,13 +718,8 @@ getAllTracks().forEach(track => {
         });
       } catch (e) {}
     }
-    audio.addEventListener('play',  syncState);
-    audio.addEventListener('pause', syncState);
     audio.addEventListener('timeupdate', syncPosition);
     audio.addEventListener('seeked', syncPosition);
-    audio.addEventListener('ended', syncState);
-
-    syncState();
     syncPosition();
   }
 
@@ -818,6 +813,37 @@ getAllTracks().forEach(track => {
     }
     document.body.removeChild(ta);
   }
+</script>
+<script>
+/* ---------- ГЛОБАЛЬНАЯ СИНХРОНИЗАЦИЯ PLAYBACK STATE ---------- */
+(function () {
+  if (!('mediaSession' in navigator)) return;
+
+  function refreshState() {
+    // смотрим — играет ли хоть один трек на странице
+    const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
+    navigator.mediaSession.playbackState = anyPlaying ? 'playing' : 'paused';
+  }
+
+  // ловим play/pause у ВСЕХ audio, включая динамически добавленные
+  document.addEventListener('play', (e) => {
+    if (e.target && e.target.tagName === 'AUDIO') {
+      setTimeout(refreshState, 30);
+    }
+  }, true);
+
+  document.addEventListener('pause', (e) => {
+    if (e.target && e.target.tagName === 'AUDIO') {
+      setTimeout(refreshState, 30);
+    }
+  }, true);
+
+  document.addEventListener('ended', (e) => {
+    if (e.target && e.target.tagName === 'AUDIO') {
+      setTimeout(refreshState, 30);
+    }
+  }, true);
+})();
 </script>
 </body>
 </html>
