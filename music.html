@@ -371,17 +371,28 @@
 
 <!-- СКРИПТЫ -->
 <script>
-  const players = document.querySelectorAll('audio');
-  players.forEach(player => {
-    player.addEventListener('play', () => {
-      players.forEach(other => {
-        if (other !== player) {
-          other.pause();
-          other.currentTime = 0;
-        }
-      });
+ const players = document.querySelectorAll('audio');
+players.forEach(player => {
+  player.addEventListener('play', () => {
+    players.forEach(other => {
+      if (other !== player) {
+        other.pause();
+        other.currentTime = 0;
+      }
     });
+
+    // iOS-фикс: полная переинициализация MediaSession
+    if ('mediaSession' in navigator) {
+      try { navigator.mediaSession.playbackState = 'none'; } catch(e) {}
+      setTimeout(() => {
+        try { navigator.mediaSession.playbackState = 'playing'; } catch(e) {}
+      }, 400);
+      setTimeout(() => {
+        try { navigator.mediaSession.playbackState = 'playing'; } catch(e) {}
+      }, 900);
+    }
   });
+});
 </script>
 
 <script>
