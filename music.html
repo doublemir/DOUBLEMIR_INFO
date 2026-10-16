@@ -675,12 +675,7 @@ getAllTracks().forEach(track => {
         audio.pause();
         audio.currentTime = 0;
       });
-      navigator.mediaSession.setActionHandler('seekbackward', (d) => {
-        audio.currentTime = Math.max(0, audio.currentTime - (d.seekOffset || 10));
-      });
-      navigator.mediaSession.setActionHandler('seekforward', (d) => {
-        audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + (d.seekOffset || 10));
-      });
+      
       navigator.mediaSession.setActionHandler('seekto', (d) => {
         if (d.seekTime != null) audio.currentTime = d.seekTime;
       });
@@ -825,29 +820,23 @@ getAllTracks().forEach(track => {
   if (!('mediaSession' in navigator)) return;
 
   function refreshState() {
-    // смотрим — играет ли хоть один трек на странице
     const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
-    navigator.mediaSession.playbackState = anyPlaying ? 'playing' : 'paused';
+    const next = anyPlaying ? 'playing' : 'paused';
+    if (navigator.mediaSession.playbackState !== next) {
+      navigator.mediaSession.playbackState = next;
+    }
   }
 
-  // ловим play/pause у ВСЕХ audio, включая динамически добавленные
-  document.addEventListener('play', (e) => {
-    if (e.target && e.target.tagName === 'AUDIO') {
-      setTimeout(refreshState, 30);
-    }
-  }, true);
+  // события — срабатывают мгновенно
+  document.addEventListener('play',  refreshState, true);
+  document.addEventListener('pause', refreshState, true);
+  document.addEventListener('ended', refreshState, true);
 
-  document.addEventListener('pause', (e) => {
-    if (e.target && e.target.tagName === 'AUDIO') {
-      setTimeout(refreshState, 30);
-    }
-  }, true);
+  // ПЛЮС поллинг каждые 500 мс — гарантия на iOS
+  setInterval(refreshState, 500);
 
-  document.addEventListener('ended', (e) => {
-    if (e.target && e.target.tagName === 'AUDIO') {
-      setTimeout(refreshState, 30);
-    }
-  }, true);
+  // сразу после загрузки
+  refreshState();
 })();
 </script>
 </body>
