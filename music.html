@@ -12,6 +12,110 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <style>
+  /* ---------- Кнопка «Слушать» вместо нативного аудио ---------- */
+  .play-btn {
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 8px;
+    padding: 8px 20px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    color: #c8ff00;
+    background: transparent;
+    border: 1px solid rgba(200, 255, 0, 0.5);
+    border-radius: 20px;
+    cursor: pointer;
+    line-height: 1.4;
+    transition: background 0.25s, color 0.25s, box-shadow 0.3s, transform 0.2s;
+  }
+  .play-btn:hover {
+    background: #c8ff00;
+    color: #0a0a0a;
+    box-shadow: 0 0 20px rgba(200,255,0,0.45);
+    transform: translateY(-2px);
+  }
+  .play-btn.playing {
+    background: #c8ff00;
+    color: #0a0a0a;
+    box-shadow: 0 0 24px rgba(200,255,0,0.55);
+  }
+
+  /* ---------- Фиксированный мини-плеер ---------- */
+  .mini-player {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 500;
+    background: rgba(10, 10, 10, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(200, 255, 0, 0.25);
+    padding: 10px 16px 12px;
+    transform: translateY(110%);
+    transition: transform 0.35s ease;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+  }
+  .mini-player.active { transform: translateY(0); }
+
+  .mini-player-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .mini-player-cover {
+    width: 44px; height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #1a1a1a;
+  }
+  .mini-player-info { min-width: 0; flex: 1; }
+  .mini-player-title {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #f2f2f2;
+  }
+  .mini-player-artist {
+    font-size: 0.7rem;
+    opacity: 0.55;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .mini-player-close {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-family: inherit;
+    transition: color 0.2s;
+  }
+  .mini-player-close:hover { color: #c8ff00; }
+
+  .mini-player audio {
+    width: 100%;
+    height: 36px;
+    filter: invert(1) hue-rotate(180deg);
+    border-radius: 8px;
+  }
+
+  @media (max-width: 600px) {
+    .mini-player { padding: 8px 10px 10px; }
+    .mini-player-cover { width: 38px; height: 38px; }
+    .mini-player-title { font-size: 0.75rem; }
+  }
+
+  /* отступ снизу, чтобы плеер не закрывал последний трек */
+  body.has-mini-player { padding-bottom: 130px; }
+  </style>
 </head>
 <body>
 <div class="scroll-progress"></div>
@@ -34,7 +138,7 @@
   <p class="platforms-label">Все треки DOUBLEMIR — слушай, качай, делись:</p>
   <button id="randomTrack" class="random-btn">🔀 Случайный трек</button>
 
- <!-- ВРЕМЯ ПОКАЖЕТ!!! -->
+  <!-- ВРЕМЯ ПОКАЖЕТ!!! -->
   <div class="album-block">
     <div class="album-header">
       <div class="album-header-cover">
@@ -50,7 +154,7 @@
         <p class="track-title">DOUBLEMIR — Девочка мечты(intro) <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="devochka-mechty"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Девочка мечты.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('devochka-mechty')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Девочка мечты.mp3" download="DOUBLEMIR — Девочка мечты.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Девочка мечты(intro)')">📤 Поделиться</button>
       </div>
@@ -58,7 +162,7 @@
         <p class="track-title">DOUBLEMIR — Мне похуй <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="mne-poxyi"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Мне похуй.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('mne-poxyi')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Мне похуй.mp3" download="DOUBLEMIR — Мне похуй.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Мне похуй')">📤 Поделиться</button>
       </div>
@@ -66,7 +170,7 @@
         <p class="track-title">DOUBLEMIR — Pull up <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="pull-up"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Pull up.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('pull-up')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Pull up.mp3" download="DOUBLEMIR — Pull up.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Pull Up')">📤 Поделиться</button>
       </div>
@@ -74,7 +178,7 @@
         <p class="track-title">DOUBLEMIR – Егермейстер <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="jagermeister"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Егермейстер.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('jagermeister')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Егермейстер.mp3" download="DOUBLEMIR — Егермейстер.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Егермейстер')">📤 Поделиться</button>
       </div>
@@ -82,7 +186,7 @@
         <p class="track-title">DOUBLEMIR – Доля правды <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="dolya-pravdy"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Доля правды.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('dolya-pravdy')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Доля правды.mp3" download="DOUBLEMIR — Доля правды.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Доля правды')">📤 Поделиться</button>
       </div>
@@ -105,7 +209,7 @@
         <p class="track-title">DOUBLEMIR – Наебал <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="naebal"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR – Наебал.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('naebal')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR – Наебал.mp3" download="DOUBLEMIR – Наебал.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Наебал')">📤 Поделиться</button>
       </div>
@@ -113,7 +217,7 @@
         <p class="track-title">DOUBLEMIR – Пантера <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="pantera"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR – Пантера.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('pantera')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR – Пантера.mp3" download="DOUBLEMIR – Пантера.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Пантера')">📤 Поделиться</button>
       </div>
@@ -121,7 +225,7 @@
         <p class="track-title">DOUBLEMIR – Похуй ваще <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="pohuy-vashe"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR – Похуй ваще.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('pohuy-vashe')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR – Похуй ваще.mp3" download="DOUBLEMIR – Похуй ваще.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Похуй ваще')">📤 Поделиться</button>
       </div>
@@ -129,7 +233,7 @@
         <p class="track-title">DOUBLEMIR – Секс по телефону <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="sex-phone"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR – Секс по телефону.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('sex-phone')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR – Секс по телефону.mp3" download="DOUBLEMIR – Секс по телефону.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Секс по телефону')">📤 Поделиться</button>
       </div>
@@ -137,18 +241,18 @@
         <p class="track-title">DOUBLEMIR – Bad Star <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="bad-star"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR – Bad Star.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('bad-star')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR – Bad Star.mp3" download="DOUBLEMIR – Bad Star.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Bad Star')">📤 Поделиться</button>
       </div>
     </div>
   </div>
 
- <!-- "17" -->
+  <!-- "17" -->
   <div class="album-block">
     <div class="album-header">
       <div class="album-header-cover">
-        <img src="img/m1000x1000 (5).jpg" alt="Альбом "17" ">
+        <img src="img/m1000x1000 (5).jpg" alt="Альбом 17">
       </div>
       <div class="album-header-info">
         <h3>"17"</h3>
@@ -160,7 +264,7 @@
         <p class="track-title">DOUBLEMIR — Влиятельный <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="vliyatelny"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Влиятельный.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('vliyatelny')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Влиятельный.mp3" download="DOUBLEMIR — Влиятельный.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Влиятельный')">📤 Поделиться</button>
       </div>
@@ -168,7 +272,7 @@
         <p class="track-title">DOUBLEMIR, nebedolaga — Треп хата <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="trap-hata"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR, nebedolaga — Треп хата.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('trap-hata')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR, nebedolaga — Треп хата.mp3" download="DOUBLEMIR, nebedolaga — Треп хата.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Треп хата')">📤 Поделиться</button>
       </div>
@@ -176,7 +280,7 @@
         <p class="track-title">DOUBLEMIR, SAKFAER — Yau <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="yau"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR, SAKFAER — Yau.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('yau')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR, SAKFAER — Yau.mp3" download="DOUBLEMIR, SAKFAER — Yau.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Yau')">📤 Поделиться</button>
       </div>
@@ -184,7 +288,7 @@
         <p class="track-title">DOUBLEMIR, f1ckit — HAHAHA <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="hahaha"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR, f1ckit — HAHAHA.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('hahaha')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR, f1ckit — HAHAHA.mp3" download="DOUBLEMIR, f1ckit — HAHAHA.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('HAHAHA')">📤 Поделиться</button>
       </div>
@@ -192,7 +296,7 @@
         <p class="track-title">DOUBLEMIR, de sent Bennett — USA MONEY <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="usa-money"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR, de sent Bennett — USA MONEY.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('usa-money')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR, de sent Bennett — USA MONEY.mp3" download="DOUBLEMIR, de sent Bennett — USA MONEY.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('USA MONEY')">📤 Поделиться</button>
       </div>
@@ -200,15 +304,15 @@
         <p class="track-title">DOUBLEMIR, f1ckit — МОДЕЛЬ <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="model"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR, f1ckit — МОДЕЛЬ.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('model')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR, f1ckit — МОДЕЛЬ.mp3" download="DOUBLEMIR, f1ckit — МОДЕЛЬ.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('МОДЕЛЬ')">📤 Поделиться</button>
       </div>
       <div class="track" id="floronce">
-        <p class="track-title">DOUBLEMIR, f1ckit — Флоронсе  <span class="explicit">E</span></p>
+        <p class="track-title">DOUBLEMIR, f1ckit — Флоронсе <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="floronce"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR, f1ckit — Флоронсе.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('floronce')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR, f1ckit — Флоронсе.mp3" download="DOUBLEMIR, f1ckit — Флоронсе.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Флоронсе')">📤 Поделиться</button>
       </div>
@@ -216,7 +320,7 @@
         <p class="track-title">DOUBLEMIR, vasyapalkiin, TOMMYTEMA, DJ ЦЕПЬ — Это я <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="eto-ya"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR, vasyapalkiin, TOMMYTEMA, DJ ЦЕПЬ — Это я.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('eto-ya')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR, vasyapalkiin, TOMMYTEMA, DJ ЦЕПЬ — Это я.mp3" download="DOUBLEMIR, vasyapalkiin, TOMMYTEMA, DJ ЦЕПЬ — Это я.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Это я')">📤 Поделиться</button>
       </div>
@@ -224,7 +328,7 @@
         <p class="track-title">DOUBLEMIR, Падший Ангел — Bonus<span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="bonus"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR, Падший Ангел — Bonus.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('bonus')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR, Падший Ангел — Bonus.mp3" download="DOUBLEMIR, Падший Ангел — Bonus.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Bonus')">📤 Поделиться</button>
       </div>
@@ -232,13 +336,12 @@
         <p class="track-title">DOUBLEMIR, weexymep — Точка <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="tochka"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR, weexymep — Точка.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('tochka')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR, weexymep — Точка.mp3" download="DOUBLEMIR, weexymep — Точка.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Точка')">📤 Поделиться</button>
       </div>
     </div>
   </div>
-
 
   <!-- СИНГЛЫ -->
   <div class="album-block">
@@ -251,12 +354,12 @@
         <p class="album-meta">12 треков · 2025–2026</p>
       </div>
     </div>
- <div class="tracklist">
+    <div class="tracklist">
       <div class="track" id="sterva" data-cover="imgsingles/sterva.jpg">
         <p class="track-title">DOUBLEMIR — Стерва <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="sterva"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR – Стерва.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('sterva')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR – Стерва.mp3" download="DOUBLEMIR – Стерва.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Стерва')">📤 Поделиться</button>
       </div>
@@ -264,7 +367,7 @@
         <p class="track-title">YMIP feat. DOUBLEMIR — only SEX <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="only-sex"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/YMIP feat. DOUBLEMIR — only SEX.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('only-sex')">▶ Слушать</button>
         <a href="audio1/YMIP feat. DOUBLEMIR — only SEX.mp3" download="DOUBLEMIR - only SEX.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('YMIP feat. DOUBLEMIR — only SEX')">📤 Поделиться</button>
       </div>
@@ -272,7 +375,7 @@
         <p class="track-title">W double, DOUBLEMIR — clean girl <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="clean-girl"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/W double, DOUBLEMIR — clean girl.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('clean-girl')">▶ Слушать</button>
         <a href="audio1/W double, DOUBLEMIR — clean girl.mp3" download="DOUBLEMIR - clean girl.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('W double, DOUBLEMIR — clean girl')">📤 Поделиться</button>
       </div>
@@ -280,7 +383,7 @@
         <p class="track-title">DOUBLEMIR, PLOHOYTARASIK — PROJECT X <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="project-x"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR, PLOHOYTARASIK — PROJECT X.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('project-x')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR, PLOHOYTARASIK — PROJECT X.mp3" download="DOUBLEMIR - PROJECT X.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('DOUBLEMIR, PLOHOYTARASIK — PROJECT X')">📤 Поделиться</button>
       </div>
@@ -288,7 +391,7 @@
         <p class="track-title">DOUBLEMIR feat. stepanenko — Взгляды под луной <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="vzglyady"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio1/DOUBLEMIR feat. stepanenko — Взгляды под луной.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('vzglyady')">▶ Слушать</button>
         <a href="audio1/DOUBLEMIR feat. stepanenko — Взгляды под луной.mp3" download="DOUBLEMIR - Взгляды под луной.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('DOUBLEMIR feat. stepanenko — Взгляды под луной')">📤 Поделиться</button>
       </div>
@@ -296,7 +399,7 @@
         <p class="track-title">DOUBLEMIR — Лабубу <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="labubu"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Лабубу.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('labubu')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Лабубу.mp3" download="DOUBLEMIR - Лабубу.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Лабубу')">📤 Поделиться</button>
       </div>
@@ -304,7 +407,7 @@
         <p class="track-title">DOUBLEMIR — Жизнь моя <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="zhizn-moya"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Жизнь моя.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('zhizn-moya')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Жизнь моя.mp3" download="DOUBLEMIR - Жизнь моя.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Жизнь моя')">📤 Поделиться</button>
       </div>
@@ -312,7 +415,7 @@
         <p class="track-title">DOUBLEMIR — Будешь со мной</p>
         <p class="track-plays" data-plays-for="budes-so-mnoy"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Будешь со мной.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('budes-so-mnoy')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Будешь со мной.mp3" download="DOUBLEMIR - Будешь со мной.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Будешь со мной')">📤 Поделиться</button>
       </div>
@@ -320,7 +423,7 @@
         <p class="track-title">DOUBLEMIR — Боль <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="bol"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Боль.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('bol')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Боль.mp3" download="DOUBLEMIR - Боль.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Боль')">📤 Поделиться</button>
       </div>
@@ -328,7 +431,7 @@
         <p class="track-title">DOUBLEMIR — Блондинка <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="blondinka"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — Блондинка.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('blondinka')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — Блондинка.mp3" download="DOUBLEMIR - Блондинка.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('Блондинка')">📤 Поделиться</button>
       </div>
@@ -336,7 +439,7 @@
         <p class="track-title">DOUBLEMIR — АйАйАй <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="ay-ay-ay"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — АЙ АЙ АЙ.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('ay-ay-ay')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — АЙ АЙ АЙ.mp3" download="DOUBLEMIR — АЙ АЙ АЙ.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('АйАйАй')">📤 Поделиться</button>
       </div>
@@ -344,7 +447,7 @@
         <p class="track-title">DOUBLEMIR — 2026 <span class="explicit">E</span></p>
         <p class="track-plays" data-plays-for="2026"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
-        <audio controls preload="none"><source src="audio2/DOUBLEMIR — 2026.mp3" type="audio/mpeg"></audio>
+        <button class="play-btn" onclick="playTrack('2026')">▶ Слушать</button>
         <a href="audio2/DOUBLEMIR — 2026.mp3" download="DOUBLEMIR - 2026.mp3" class="download-btn">⬇ Скачать MP3</a>
         <button class="share-btn" onclick="shareTrack('2026')">📤 Поделиться</button>
       </div>
@@ -369,512 +472,461 @@
 
 <button id="toTop" aria-label="Наверх">↑</button>
 
-<!-- СКРИПТЫ -->
-<script>
- const players = document.querySelectorAll('audio');
-players.forEach(player => {
-  player.addEventListener('play', () => {
-    players.forEach(other => {
-      if (other !== player) {
-        other.pause();
-        other.currentTime = 0;
-      }
-    });
+<!-- ФИКСИРОВАННЫЙ МИНИ-ПЛЕЕР (единственный <audio> на странице) -->
+<div class="mini-player" id="miniPlayer">
+  <div class="mini-player-top">
+    <img class="mini-player-cover" id="miniPlayerCover" src="img/1000x1000.jpg" alt="">
+    <div class="mini-player-info">
+      <div class="mini-player-title" id="miniPlayerTitle">—</div>
+      <div class="mini-player-artist" id="miniPlayerArtist">DOUBLEMIR</div>
+    </div>
+    <button class="mini-player-close" id="miniPlayerClose" aria-label="Закрыть">✕</button>
+  </div>
+  <audio id="globalAudio" controls preload="none"></audio>
+</div>
 
-    // iOS-фикс: полная переинициализация MediaSession
-    if ('mediaSession' in navigator) {
-      try { navigator.mediaSession.playbackState = 'none'; } catch(e) {}
-      setTimeout(() => {
-        try { navigator.mediaSession.playbackState = 'playing'; } catch(e) {}
-      }, 400);
-      setTimeout(() => {
-        try { navigator.mediaSession.playbackState = 'playing'; } catch(e) {}
-      }, 900);
+<script>
+/* ---------- ПРИНУДИТЕЛЬНО НАВЕРХ ---------- */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+/* ---------- REVEAL ---------- */
+const revealElements = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
     }
   });
+}, { threshold: 0.15 });
+revealElements.forEach(el => observer.observe(el));
+
+/* ---------- ПОЛОСА ПРОГРЕССА ---------- */
+const progressBar = document.querySelector('.scroll-progress');
+if (progressBar) {
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const p = h > 0 ? (window.scrollY / h) * 100 : 0;
+    progressBar.style.width = p + '%';
+  });
+}
+
+/* ---------- КНОПКА НАВЕРХ ---------- */
+const toTop = document.getElementById('toTop');
+if (toTop) {
+  window.addEventListener('scroll', () => {
+    toTop.classList.toggle('show', window.scrollY > 500);
+  });
+  toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+}
+
+/* ---------- ПЛЕЕР: один <audio> ---------- */
+const audio = document.getElementById('globalAudio');
+const miniPlayer = document.getElementById('miniPlayer');
+const miniPlayerCover = document.getElementById('miniPlayerCover');
+const miniPlayerTitle = document.getElementById('miniPlayerTitle');
+const miniPlayerArtist = document.getElementById('miniPlayerArtist');
+const miniPlayerClose = document.getElementById('miniPlayerClose');
+
+let currentTrackId = null;
+let shuffleMode = false;
+let shuffleQueue = [];
+
+function getAllTracks() {
+  return [...document.querySelectorAll('.track')];
+}
+
+function getTrackData(trackEl) {
+  const dlLink = trackEl.querySelector('.download-btn');
+  const titleEl = trackEl.querySelector('.track-title');
+  let cover = trackEl.dataset.cover || '';
+  if (!cover) {
+    const album = trackEl.closest('.album-block');
+    const img = album && album.querySelector('.album-header-cover img');
+    if (img) cover = img.getAttribute('src');
+  }
+  return {
+    el: trackEl,
+    id: trackEl.id,
+    src: dlLink ? dlLink.getAttribute('href') : '',
+    title: titleEl ? titleEl.textContent.replace(/\s*E\s*$/, '').trim() : 'DOUBLEMIR',
+    cover: cover
+  };
+}
+
+function setPlayingUI(trackEl, isPlaying) {
+  document.querySelectorAll('.track.playing').forEach(t => {
+    t.classList.remove('playing');
+    const btn = t.querySelector('.play-btn');
+    if (btn) btn.textContent = '▶ Слушать';
+  });
+  if (trackEl && isPlaying) {
+    trackEl.classList.add('playing');
+    const btn = trackEl.querySelector('.play-btn');
+    if (btn) btn.textContent = '⏸ Пауза';
+  }
+}
+
+function showMiniPlayer(data) {
+  miniPlayer.classList.add('active');
+  document.body.classList.add('has-mini-player');
+  if (data) {
+    miniPlayerTitle.textContent = data.title;
+    miniPlayerCover.src = data.cover || 'img/1000x1000.jpg';
+    miniPlayerArtist.textContent = 'DOUBLEMIR';
+  }
+}
+
+function hideMiniPlayer() {
+  miniPlayer.classList.remove('active');
+  document.body.classList.remove('has-mini-player');
+}
+
+function playTrack(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const data = getTrackData(el);
+
+  // Тот же трек — toggle
+  if (currentTrackId === id) {
+    if (audio.paused) audio.play();
+    else audio.pause();
+    return;
+  }
+
+  if (!data.src) return;
+  currentTrackId = id;
+
+  // Обновляем src (без полной перезагрузки, если новый файл)
+  audio.src = data.src;
+  audio.load();
+  audio.play().catch(() => {});
+
+  showMiniPlayer(data);
+  updateMediaSession(data);
+}
+
+function playNext() {
+  const tracks = getAllTracks();
+  if (!tracks.length) return;
+  if (shuffleMode) {
+    let next = shuffleQueue.shift();
+    if (!next) {
+      const others = tracks.filter(t => t.id !== currentTrackId);
+      shuffleQueue = shuffleArray(others);
+      next = shuffleQueue.shift();
+    }
+    if (next) playTrack(next.id);
+  } else {
+    const i = tracks.findIndex(t => t.id === currentTrackId);
+    const next = tracks[i + 1] || tracks[0];
+    if (next) playTrack(next.id);
+  }
+}
+
+function playPrev() {
+  const tracks = getAllTracks();
+  if (!tracks.length) return;
+  const i = tracks.findIndex(t => t.id === currentTrackId);
+  const prev = tracks[i - 1] || tracks[tracks.length - 1];
+  if (prev) playTrack(prev.id);
+}
+
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ---------- СОБЫТИЯ AUDIO ---------- */
+audio.addEventListener('play', () => {
+  const el = document.getElementById(currentTrackId);
+  if (el) setPlayingUI(el, true);
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
 });
-</script>
 
-<script>
-  if ('scrollRestoration' in history) {
-    history.scrollRestoration = 'manual';
-  }
+audio.addEventListener('pause', () => {
+  const el = document.getElementById(currentTrackId);
+  if (el) setPlayingUI(el, false);
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+});
 
-  const revealElements = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15 });
-  revealElements.forEach(el => observer.observe(el));
-
-  const progressBar = document.querySelector('.scroll-progress');
-  if (progressBar) {
-    window.addEventListener('scroll', () => {
-      const h = document.documentElement.scrollHeight - window.innerHeight;
-      const p = h > 0 ? (window.scrollY / h) * 100 : 0;
-      progressBar.style.width = p + '%';
-    });
-  }
-
-  const toTop = document.getElementById('toTop');
-  if (toTop) {
-    window.addEventListener('scroll', () => {
-      toTop.classList.toggle('show', window.scrollY > 500);
-    });
-    toTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  document.querySelectorAll('.track').forEach(track => {
-    const audio = track.querySelector('audio');
-    if (!audio) return;
-    audio.addEventListener('play', () => {
-      document.querySelectorAll('.track.playing').forEach(t => t.classList.remove('playing'));
-      track.classList.add('playing');
-    });
-    audio.addEventListener('pause', () => track.classList.remove('playing'));
-    audio.addEventListener('ended', () => track.classList.remove('playing'));
-  });
-
-  document.querySelectorAll('.track').forEach(track => {
-    const audio = track.querySelector('audio');
-    const counter = track.querySelector('.track-plays');
-    if (!audio || !counter) return;
-    const key = 'plays_' + counter.dataset.playsFor;
-    const saved = localStorage.getItem(key);
-    if (saved) counter.textContent = 'Вы слушали ' + saved + ' раз';
-    audio.addEventListener('ended', () => {
-      const current = parseInt(localStorage.getItem(key) || '0', 10) + 1;
-      localStorage.setItem(key, current);
-      counter.textContent = 'Вы слушали ' + current + ' раз';
-    });
-  });
-
-  (function () {
-    const logo = document.querySelector('.logo');
-    if (!logo) return;
-    let clicks = 0;
-    let timer = null;
-    logo.style.cursor = 'pointer';
-    logo.style.userSelect = 'none';
-    logo.addEventListener('click', () => {
-      clicks++;
-      clearTimeout(timer);
-      timer = setTimeout(() => { clicks = 0; }, 3000);
-      if (clicks === 5) {
-        clicks = 0;
-        clearTimeout(timer);
-        triggerEasterEgg();
-      }
-    });
-
-    function triggerEasterEgg() {
-      document.body.style.transition = 'filter 0.4s ease';
-      document.body.style.filter = 'invert(1) hue-rotate(180deg)';
-      const hero = document.querySelector('.hero') || document.querySelector('.section');
-      if (!hero) return;
-      hero.scrollIntoView({ behavior: 'instant', block: 'start' });
-
-      setTimeout(() => {
-        const heroRect = hero.getBoundingClientRect();
-        const isMobile = window.innerWidth < 700;
-        const zoneLeft = heroRect.left;
-        const zoneRight = heroRect.right;
-        const zoneTop = heroRect.top;
-        const zoneBottom = heroRect.bottom;
-        const zoneW = zoneRight - zoneLeft;
-        const zoneH = zoneBottom - zoneTop;
-        const fontSize = isMobile ? 22 : 40;
-        const itemW = fontSize * 3.2;
-        const itemH = fontSize * 1.4;
-        const pad = 14;
-        const total = isMobile ? 8 : 16;
-        const placed = [];
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:999999;overflow:hidden;';
-        document.body.appendChild(overlay);
-
-        let attempts = 0;
-        while (placed.length < total && attempts < 800) {
-          attempts++;
-          const x = zoneLeft + itemW / 2 + Math.random() * (zoneW - itemW);
-          const y = zoneTop + itemH / 2 + Math.random() * (zoneH - itemH);
-          let collision = false;
-          for (const p of placed) {
-            if (Math.abs(x - p.x) < itemW + pad && Math.abs(y - p.y) < itemH + pad) {
-              collision = true;
-              break;
-            }
-          }
-          if (!collision) placed.push({ x, y });
-        }
-        placed.sort(() => Math.random() - 0.5);
-        placed.forEach((pos, i) => {
-          const el = document.createElement('div');
-          el.textContent = 'GOAT';
-          el.style.position = 'fixed';
-          el.style.left = pos.x + 'px';
-          el.style.top = pos.y + 'px';
-          el.style.fontFamily = "'Unbounded', sans-serif";
-          el.style.fontSize = fontSize + 'px';
-          el.style.fontWeight = '900';
-          el.style.letterSpacing = '4px';
-          el.style.color = '#c8ff00';
-          el.style.textShadow = '0 0 25px rgba(200,255,0,0.95), 0 0 50px rgba(200,255,0,0.6)';
-          el.style.opacity = '0';
-          el.style.transform = 'translate(-50%, -50%) scale(0.2) rotate(' + (Math.random() * 80 - 40) + 'deg)';
-          el.style.transition = 'opacity 0.4s ease, transform 0.8s cubic-bezier(0.34,1.56,0.64,1)';
-          el.style.whiteSpace = 'nowrap';
-          el.style.pointerEvents = 'none';
-          el.style.zIndex = '999999';
-          overlay.appendChild(el);
-          setTimeout(() => {
-            el.style.opacity = '1';
-            el.style.transform = 'translate(-50%, -50%) scale(1) rotate(' + (Math.random() * 80 - 40) + 'deg)';
-          }, i * 80 + Math.random() * 120);
-        });
-        setTimeout(() => {
-          document.body.style.filter = '';
-          overlay.style.transition = 'opacity 0.5s';
-          overlay.style.opacity = '0';
-          setTimeout(() => overlay.remove(), 500);
-        }, 2500);
-      }, 50);
+audio.addEventListener('ended', () => {
+  const el = document.getElementById(currentTrackId);
+  if (el) {
+    const counter = el.querySelector('.track-plays');
+    if (counter) {
+      const key = 'plays_' + counter.dataset.playsFor;
+      const n = parseInt(localStorage.getItem(key) || '0', 10) + 1;
+      localStorage.setItem(key, n);
+      counter.textContent = 'Вы слушали ' + n + ' раз';
     }
-  })();
-
-  let shuffleMode = false;
-  let shuffleQueue = [];
-  let switching = false;
-
-  function getAllTracks() {
-    return Array.from(document.querySelectorAll('.track'));
   }
+  playNext();
+});
 
-  function playTrackAuto(track) {
-    if (!track) return;
-    switching = true;
-    track.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    document.querySelectorAll('audio').forEach(a => {
-      if (a !== track.querySelector('audio')) {
-        a.pause();
-        a.currentTime = 0;
-      }
-    });
-    setTimeout(() => {
-      const audio = track.querySelector('audio');
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(() => {});
-      }
-      switching = false;
-    }, 500);
-  }
+/* ---------- СЧЁТЧИК ПРОСЛУШИВАНИЙ (показ сохранённых) ---------- */
+document.querySelectorAll('.track').forEach(track => {
+  const counter = track.querySelector('.track-plays');
+  if (!counter) return;
+  const key = 'plays_' + counter.dataset.playsFor;
+  const saved = localStorage.getItem(key);
+  if (saved) counter.textContent = 'Вы слушали ' + saved + ' раз';
+});
 
-  function shuffleArray(arr) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  getAllTracks().forEach(track => {
-    const audio = track.querySelector('audio');
-    if (!audio) return;
-    audio.addEventListener('ended', () => {
-      if (switching) return;
-      const tracks = getAllTracks();
-      if (shuffleMode) {
-        let next = shuffleQueue.shift();
-        if (!next) {
-          const others = tracks.filter(t => t !== track);
-          shuffleQueue = shuffleArray(others);
-          next = shuffleQueue.shift();
-        }
-        playTrackAuto(next || tracks[0]);
-      } else {
-        const idx = tracks.indexOf(track);
-        const next = tracks[idx + 1] || tracks[0];
-        playTrackAuto(next);
-      }
-    });
-  });
-
+/* ---------- СЛУЧАЙНЫЙ ТРЕК ---------- */
 const randomBtn = document.getElementById('randomTrack');
 if (randomBtn) {
-  const newBtn = randomBtn.cloneNode(true);
-  randomBtn.parentNode.replaceChild(newBtn, randomBtn);
-  newBtn.addEventListener('click', () => {
+  randomBtn.addEventListener('click', () => {
     shuffleMode = true;
-    newBtn.classList.add('active');
+    randomBtn.classList.add('active');
     const tracks = getAllTracks();
     if (!tracks.length) return;
     const first = tracks[Math.floor(Math.random() * tracks.length)];
-    const others = tracks.filter(t => t !== first);
-    shuffleQueue = shuffleArray(others);
-    playTrackAuto(first);
+    shuffleQueue = shuffleArray(tracks.filter(t => t !== first));
+    playTrack(first.id);
   });
 }
-/* Выключаем shuffle ТОЛЬКО при клике на название трека */
-getAllTracks().forEach(track => {
-  const title = track.querySelector('.track-title');
-  if (!title) return;
-  title.addEventListener('click', () => {
-    shuffleMode = false;
-    shuffleQueue = [];
-    const btn = document.getElementById('randomTrack');
-    if (btn) btn.classList.remove('active');
-  });
+
+/* ---------- ЗАКРЫТЬ МИНИ-ПЛЕЕР ---------- */
+miniPlayerClose.addEventListener('click', () => {
+  audio.pause();
+  audio.removeAttribute('src');
+  audio.load();
+  currentTrackId = null;
+  setPlayingUI(null, false);
+  hideMiniPlayer();
+  if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
 });
-/* ---------- МЕТАДАННЫЕ + СИНХРОНИЗАЦИЯ ДЛЯ CONTROL CENTER / LOCK SCREEN ---------- */
-(function () {
+
+/* ---------- MEDIA SESSION ---------- */
+function updateMediaSession(data) {
   if (!('mediaSession' in navigator)) return;
-
-  function updateMediaSession(track) {
-    const titleEl = track.querySelector('.track-title');
-    const audio = track.querySelector('audio');
-    if (!audio) return;
-
-    let coverUrl = '';
-
-    // 1. Индивидуальная обложка трека
-    if (track.dataset.cover) {
-      coverUrl = new URL(track.dataset.cover, window.location.href).href;
-    } else {
-      // 2. Обложка альбома
-      const albumBlock = track.closest('.album-block');
-      if (albumBlock) {
-        const coverImg = albumBlock.querySelector('.album-header-cover img');
-        if (coverImg && coverImg.src) coverUrl = coverImg.src;
-      }
-    }
-
-    // Страховка от пробелов и скобок
-    if (coverUrl) {
-      try { coverUrl = encodeURI(decodeURI(coverUrl)); } catch (e) {}
-    }
-
-    let titleText = 'DOUBLEMIR';
-    if (titleEl) titleText = titleEl.textContent.replace(/\s*E\s*$/, '').trim();
-
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: titleText,
-      artist: 'DOUBLEMIR INFO',
-      album: 'DOUBLEMIR INFO',
-      artwork: coverUrl ? [
-        { src: coverUrl, sizes: '96x96',   type: 'image/jpeg' },
-        { src: coverUrl, sizes: '128x128', type: 'image/jpeg' },
-        { src: coverUrl, sizes: '192x192', type: 'image/jpeg' },
-        { src: coverUrl, sizes: '256x256', type: 'image/jpeg' },
-        { src: coverUrl, sizes: '384x384', type: 'image/jpeg' },
-        { src: coverUrl, sizes: '512x512', type: 'image/jpeg' }
-      ] : []
-    });
-
-    // --- Кнопки в системном плеере ---
-    try {
-      navigator.mediaSession.setActionHandler('play',  () => audio.play());
-      navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-      navigator.mediaSession.setActionHandler('stop',  () => {
-        audio.pause();
-        audio.currentTime = 0;
-      });
-      
-      navigator.mediaSession.setActionHandler('seekto', (d) => {
-        if (d.seekTime != null) audio.currentTime = d.seekTime;
-      });
-      navigator.mediaSession.setActionHandler('previoustrack', () => {
-        const all = [...document.querySelectorAll('.track')];
-        const i = all.indexOf(track);
-        if (i > 0) all[i - 1].querySelector('audio')?.play();
-      });
-      navigator.mediaSession.setActionHandler('nexttrack', () => {
-        const all = [...document.querySelectorAll('.track')];
-        const i = all.indexOf(track);
-        if (i < all.length - 1) all[i + 1].querySelector('audio')?.play();
-      });
-    } catch (e) {}
-
-    // --- Синхронизация play/pause и позиции ---
-      function syncState() {
-      // Смотрим, играет ли ХОТЬ ОДИН трек на странице
-      const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
-      navigator.mediaSession.playbackState = anyPlaying ? 'playing' : 'paused';
-    }
-
-    function syncPosition() {
-      if (!('setPositionState' in navigator.mediaSession)) return;
-
-      // Берём трек, который РЕАЛЬНО играет сейчас
-      const playing = [...document.querySelectorAll('audio')].find(a => !a.paused);
-      if (!playing || !playing.duration || !isFinite(playing.duration)) return;
-
-      try {
-        navigator.mediaSession.setPositionState({
-          duration: playing.duration,
-          playbackRate: playing.playbackRate,
-          position: Math.min(playing.currentTime, playing.duration)
-        });
-      } catch (e) {}
-    }
-    audio.addEventListener('timeupdate', syncPosition);
-    audio.addEventListener('seeked', syncPosition);
-    syncPosition();
- // Принудительно обновляем состояние после смены трека
-    setTimeout(() => {
-      const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
-      navigator.mediaSession.playbackState = anyPlaying ? 'playing' : 'paused';
-    }, 100);
+  let cover = data.cover;
+  if (cover) {
+    try { cover = encodeURI(decodeURI(cover)); } catch(e) {}
   }
 
-  document.querySelectorAll('.track').forEach(track => {
-    const audio = track.querySelector('audio');
-    if (!audio) return;
-    audio.addEventListener('play', () => updateMediaSession(track));
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: data.title,
+    artist: 'DOUBLEMIR INFO',
+    album: 'DOUBLEMIR INFO',
+    artwork: cover ? [
+      { src: cover, sizes: '96x96',   type: 'image/jpeg' },
+      { src: cover, sizes: '128x128', type: 'image/jpeg' },
+      { src: cover, sizes: '192x192', type: 'image/jpeg' },
+      { src: cover, sizes: '256x256', type: 'image/jpeg' },
+      { src: cover, sizes: '384x384', type: 'image/jpeg' },
+      { src: cover, sizes: '512x512', type: 'image/jpeg' }
+    ] : []
   });
-})();
+}
 
-  function shareTrack(trackName) {
-    const anchorMap = {
-      'Наебал': 'naebal',
-      'Пантера': 'pantera',
-      'Похуй ваще': 'pohuy-vashe',
-      'Секс по телефону': 'sex-phone',
-      'Bad Star': 'bad-star',
-      'YMIP feat. DOUBLEMIR — only SEX': 'only-sex',
-      'W double, DOUBLEMIR — clean girl': 'clean-girl',
-      'DOUBLEMIR, PLOHOYTARASIK — PROJECT X': 'project-x',
-      'DOUBLEMIR feat. stepanenko — Взгляды под луной': 'vzglyady',
-      'Лабубу': 'labubu',
-      'Жизнь моя': 'zhizn-moya',
-      'Будешь со мной': 'budes-so-mnoy',
-      'Боль': 'bol',
-      'Блондинка': 'blondinka',
-      'АйАйАй': 'ay-ay-ay',
-      '2026': '2026'
-    };
-    const anchor = anchorMap[trackName] || '';
-    const baseUrl = window.location.origin + window.location.pathname;
-    const url = anchor ? baseUrl + '#' + anchor : baseUrl;
-    const text = 'Слушай «' + trackName + '» — DOUBLEMIR INFO';
-    const fullText = text + '\n' + url;
-
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const isYandex = /YaBrowser/i.test(navigator.userAgent);
-    if (isMobile && !isYandex && navigator.share) {
-      navigator.share({
-        title: 'DOUBLEMIR INFO — ' + trackName,
-        text: text,
-        url: url
-      }).catch(() => {});
-      return;
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(fullText).then(() => {
-        showCopied(trackName);
-      }).catch(() => {
-        fallbackCopy(fullText, trackName);
-      });
-      return;
-    }
-    fallbackCopy(fullText, trackName);
-  }
-
-  function showCopied(trackName) {
-    const buttons = document.querySelectorAll('.share-btn');
-    buttons.forEach(btn => {
-      if (btn.textContent.includes('Поделиться') &&
-          btn.getAttribute('onclick').includes(trackName)) {
-        const original = btn.textContent;
-        btn.textContent = '✓ Скопировано';
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = original;
-          btn.classList.remove('copied');
-        }, 1800);
-      }
+if ('mediaSession' in navigator) {
+  try {
+    navigator.mediaSession.setActionHandler('play',  () => audio.play());
+    navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+    navigator.mediaSession.setActionHandler('stop',  () => { audio.pause(); audio.currentTime = 0; });
+    navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
+    navigator.mediaSession.setActionHandler('nexttrack',    () => playNext());
+    navigator.mediaSession.setActionHandler('seekto', (d) => {
+      if (d.seekTime != null) audio.currentTime = d.seekTime;
     });
-  }
+  } catch (e) {}
+}
 
-  function fallbackCopy(text, trackName) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    ta.style.top = '0';
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    try {
-      const ok = document.execCommand('copy');
-      if (ok) {
-        showCopied(trackName);
-      } else {
-        prompt('Скопируйте ссылку:', text);
-      }
-    } catch (e) {
-      prompt('Скопируйте ссылку:', text);
-    }
-    document.body.removeChild(ta);
-  }
-</script>
-<script>
-/* ---------- ГЛОБАЛЬНАЯ СИНХРОНИЗАЦИЯ PLAYBACK STATE ---------- */
+/* ---------- СИНХРОНИЗАЦИЯ ПОЗИЦИИ ---------- */
+audio.addEventListener('timeupdate', () => {
+  if (!('mediaSession' in navigator) || !('setPositionState' in navigator.mediaSession)) return;
+  if (!audio.duration || !isFinite(audio.duration)) return;
+  try {
+    navigator.mediaSession.setPositionState({
+      duration: audio.duration,
+      playbackRate: audio.playbackRate,
+      position: Math.min(audio.currentTime, audio.duration)
+    });
+  } catch (e) {}
+});
+
+/* ---------- ЛОГОТИП — ПАСХАЛКА ---------- */
 (function () {
-  if (!('mediaSession' in navigator)) return;
-
-  function anyAudioPlaying() {
-    return [...document.querySelectorAll('audio')].some(a => !a.paused);
-  }
-
-  function setState(state) {
-    if (navigator.mediaSession.playbackState !== state) {
-      navigator.mediaSession.playbackState = state;
+  const logo = document.querySelector('.logo');
+  if (!logo) return;
+  let clicks = 0, timer = null;
+  logo.style.cursor = 'pointer';
+  logo.style.userSelect = 'none';
+  logo.addEventListener('click', () => {
+    clicks++;
+    clearTimeout(timer);
+    timer = setTimeout(() => { clicks = 0; }, 3000);
+    if (clicks === 5) {
+      clicks = 0;
+      clearTimeout(timer);
+      triggerEasterEgg();
     }
-  }
+  });
 
-  // play: ставим 'playing' СРАЗУ и ещё раз через 0 мс — никаких задержек
-  document.addEventListener('play', (e) => {
-    if (e.target && e.target.tagName === 'AUDIO') {
-      setState('playing');
-      setTimeout(() => setState('playing'), 0);
-      setTimeout(() => setState('playing'), 50);
-      setTimeout(() => setState('playing'), 150);
-    }
-  }, true);
+  function triggerEasterEgg() {
+    document.body.style.transition = 'filter 0.4s ease';
+    document.body.style.filter = 'invert(1) hue-rotate(180deg)';
+    const hero = document.querySelector('.hero') || document.querySelector('.section');
+    if (!hero) return;
+    hero.scrollIntoView({ behavior: 'instant', block: 'start' });
+    setTimeout(() => {
+      const heroRect = hero.getBoundingClientRect();
+      const isMobile = window.innerWidth < 700;
+      const fontSize = isMobile ? 22 : 40;
+      const itemW = fontSize * 3.2;
+      const itemH = fontSize * 1.4;
+      const pad = 14;
+      const total = isMobile ? 8 : 16;
+      const placed = [];
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:999999;overflow:hidden;';
+      document.body.appendChild(overlay);
 
-  // pause: ставим 'paused' ТОЛЬКО если больше никто не играет
-  document.addEventListener('pause', (e) => {
-    if (e.target && e.target.tagName === 'AUDIO') {
+      let attempts = 0;
+      while (placed.length < total && attempts < 800) {
+        attempts++;
+        const x = heroRect.left + itemW / 2 + Math.random() * (heroRect.width - itemW);
+        const y = heroRect.top + itemH / 2 + Math.random() * (heroRect.height - itemH);
+        let collision = false;
+        for (const p of placed) {
+          if (Math.abs(x - p.x) < itemW + pad && Math.abs(y - p.y) < itemH + pad) {
+            collision = true; break;
+          }
+        }
+        if (!collision) placed.push({ x, y });
+      }
+      placed.sort(() => Math.random() - 0.5);
+      placed.forEach((pos, i) => {
+        const el = document.createElement('div');
+        el.textContent = 'GOAT';
+        el.style.cssText = 'position:fixed;left:' + pos.x + 'px;top:' + pos.y + 'px;' +
+          "font-family:'Unbounded',sans-serif;font-size:" + fontSize + "px;font-weight:900;" +
+          'letter-spacing:4px;color:#c8ff00;' +
+          'text-shadow:0 0 25px rgba(200,255,0,0.95),0 0 50px rgba(200,255,0,0.6);' +
+          'opacity:0;white-space:nowrap;pointer-events:none;z-index:999999;' +
+          'transform:translate(-50%,-50%) scale(0.2);' +
+          'transition:opacity 0.4s ease, transform 0.8s cubic-bezier(0.34,1.56,0.64,1);';
+        overlay.appendChild(el);
+        setTimeout(() => {
+          el.style.opacity = '1';
+          el.style.transform = 'translate(-50%,-50%) scale(1) rotate(' + (Math.random() * 80 - 40) + 'deg)';
+        }, i * 80 + Math.random() * 120);
+      });
       setTimeout(() => {
-        if (!anyAudioPlaying()) setState('paused');
-      }, 50);
-    }
-  }, true);
-
-  // ended: аналогично pause
-  document.addEventListener('ended', (e) => {
-    if (e.target && e.target.tagName === 'AUDIO') {
-      setTimeout(() => {
-        if (!anyAudioPlaying()) setState('paused');
-      }, 50);
-    }
-  }, true);
-
-  // Страховочный поллинг — если что-то пропустилось
-  setInterval(() => {
-    setState(anyAudioPlaying() ? 'playing' : 'paused');
-  }, 500);
-
-  setState(anyAudioPlaying() ? 'playing' : 'paused');
+        document.body.style.filter = '';
+        overlay.style.transition = 'opacity 0.5s';
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 500);
+      }, 2500);
+    }, 50);
+  }
 })();
+
+/* ---------- ПОДЕЛИТЬСЯ ТРЕКОМ ---------- */
+function shareTrack(trackName) {
+  const anchorMap = {
+    'Девочка мечты(intro)': 'devochka-mechty',
+    'Мне похуй': 'mne-poxyi',
+    'Pull Up': 'pull-up',
+    'Егермейстер': 'jagermeister',
+    'Доля правды': 'dolya-pravdy',
+    'Наебал': 'naebal',
+    'Пантера': 'pantera',
+    'Похуй ваще': 'pohuy-vashe',
+    'Секс по телефону': 'sex-phone',
+    'Bad Star': 'bad-star',
+    'Влиятельный': 'vliyatelny',
+    'Треп хата': 'trap-hata',
+    'Yau': 'yau',
+    'HAHAHA': 'hahaha',
+    'USA MONEY': 'usa-money',
+    'МОДЕЛЬ': 'model',
+    'Флоронсе': 'floronce',
+    'Это я': 'eto-ya',
+    'Bonus': 'bonus',
+    'Точка': 'tochka',
+    'Стерва': 'sterva',
+    'YMIP feat. DOUBLEMIR — only SEX': 'only-sex',
+    'W double, DOUBLEMIR — clean girl': 'clean-girl',
+    'DOUBLEMIR, PLOHOYTARASIK — PROJECT X': 'project-x',
+    'DOUBLEMIR feat. stepanenko — Взгляды под луной': 'vzglyady',
+    'Лабубу': 'labubu',
+    'Жизнь моя': 'zhizn-moya',
+    'Будешь со мной': 'budes-so-mnoy',
+    'Боль': 'bol',
+    'Блондинка': 'blondinka',
+    'АйАйАй': 'ay-ay-ay',
+    '2026': '2026'
+  };
+  const anchor = anchorMap[trackName] || '';
+  const baseUrl = window.location.origin + '/music.html';
+  const url = anchor ? baseUrl + '#' + anchor : baseUrl;
+  const text = 'Слушай «' + trackName + '» — DOUBLEMIR INFO';
+  const fullText = text + '\n' + url;
+
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isYandex = /YaBrowser/i.test(navigator.userAgent);
+
+  if (isMobile && !isYandex && navigator.share) {
+    navigator.share({
+      title: 'DOUBLEMIR INFO — ' + trackName,
+      text: text,
+      url: url
+    }).catch(() => {});
+    return;
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(fullText).then(() => showCopied(trackName))
+      .catch(() => fallbackCopy(fullText, trackName));
+    return;
+  }
+  fallbackCopy(fullText, trackName);
+}
+
+function showCopied(trackName) {
+  document.querySelectorAll('.share-btn').forEach(btn => {
+    if (btn.textContent.includes('Поделиться') &&
+        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(trackName)) {
+      const original = btn.textContent;
+      btn.textContent = '✓ Скопировано';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1800);
+    }
+  });
+}
+
+function fallbackCopy(text, trackName) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    if (document.execCommand('copy')) showCopied(trackName);
+    else prompt('Скопируйте ссылку:', text);
+  } catch (e) { prompt('Скопируйте ссылку:', text); }
+  document.body.removeChild(ta);
+}
+
+/* ---------- АВТОСКРОЛЛ К ТРЕКУ ИЗ URL ---------- */
+window.addEventListener('load', () => {
+  if (window.location.hash) {
+    const id = window.location.hash.slice(1);
+    const el = document.getElementById(id);
+    if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
+  }
+});
 </script>
 </body>
 </html>
