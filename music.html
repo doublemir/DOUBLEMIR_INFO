@@ -371,15 +371,26 @@
 
 <!-- СКРИПТЫ -->
 <script>
-const players = document.querySelectorAll('audio');
+ const players = document.querySelectorAll('audio');
 players.forEach(player => {
   player.addEventListener('play', () => {
     players.forEach(other => {
-      if (other !== player && !other.paused) {
+      if (other !== player) {
         other.pause();
         other.currentTime = 0;
       }
     });
+
+    // iOS-фикс: полная переинициализация MediaSession
+    if ('mediaSession' in navigator) {
+      try { navigator.mediaSession.playbackState = 'none'; } catch(e) {}
+      setTimeout(() => {
+        try { navigator.mediaSession.playbackState = 'playing'; } catch(e) {}
+      }, 400);
+      setTimeout(() => {
+        try { navigator.mediaSession.playbackState = 'playing'; } catch(e) {}
+      }, 900);
+    }
   });
 });
 </script>
@@ -691,7 +702,12 @@ getAllTracks().forEach(track => {
       });
     } catch (e) {}
 
-  
+    // --- Синхронизация play/pause и позиции ---
+      function syncState() {
+      // Смотрим, играет ли ХОТЬ ОДИН трек на странице
+      const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
+      navigator.mediaSession.playbackState = anyPlaying ? 'playing' : 'paused';
+    }
 
     function syncPosition() {
       if (!('setPositionState' in navigator.mediaSession)) return;
@@ -711,7 +727,12 @@ getAllTracks().forEach(track => {
     audio.addEventListener('timeupdate', syncPosition);
     audio.addEventListener('seeked', syncPosition);
     syncPosition();
-
+ // Принудительно обновляем состояние после смены трека
+    setTimeout(() => {
+      const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
+      navigator.mediaSession.playbackState = anyPlaying ? 'playing' : 'paused';
+    }, 100);
+  }
 
   document.querySelectorAll('.track').forEach(track => {
     const audio = track.querySelector('audio');
@@ -805,34 +826,54 @@ getAllTracks().forEach(track => {
   }
 </script>
 <script>
-/* ---------- ЕДИНСТВЕННЫЙ ИСТОЧНИК ПРАВДЫ ДЛЯ PLAYBACK STATE ---------- */
+/* ---------- ГЛОБАЛЬНАЯ СИНХРОНИЗАЦИЯ PLAYBACK STATE ---------- */
 (function () {
   if (!('mediaSession' in navigator)) return;
 
+  function anyAudioPlaying() {
+    return [...document.querySelectorAll('audio')].some(a => !a.paused);
+  }
+
+  function setState(state) {
+    if (navigator.mediaSession.playbackState !== state) {
+      navigator.mediaSession.playbackState = state;
+    }
+  }
+
+  // play: ставим 'playing' СРАЗУ и ещё раз через 0 мс — никаких задержек
   document.addEventListener('play', (e) => {
     if (e.target && e.target.tagName === 'AUDIO') {
-      navigator.mediaSession.playbackState = 'playing';
+      setState('playing');
+      setTimeout(() => setState('playing'), 0);
+      setTimeout(() => setState('playing'), 50);
+      setTimeout(() => setState('playing'), 150);
     }
   }, true);
 
+  // pause: ставим 'paused' ТОЛЬКО если больше никто не играет
   document.addEventListener('pause', (e) => {
     if (e.target && e.target.tagName === 'AUDIO') {
-      // даём событиям устояться, потом проверяем — играет ли что-то
       setTimeout(() => {
-        const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
-        if (!anyPlaying) navigator.mediaSession.playbackState = 'paused';
-      }, 30);
+        if (!anyAudioPlaying()) setState('paused');
+      }, 50);
     }
   }, true);
 
+  // ended: аналогично pause
   document.addEventListener('ended', (e) => {
     if (e.target && e.target.tagName === 'AUDIO') {
       setTimeout(() => {
-        const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
-        if (!anyPlaying) navigator.mediaSession.playbackState = 'paused';
-      }, 30);
+        if (!anyAudioPlaying()) setState('paused');
+      }, 50);
     }
   }, true);
+
+  // Страховочный поллинг — если что-то пропустилось
+  setInterval(() => {
+    setState(anyAudioPlaying() ? 'playing' : 'paused');
+  }, 500);
+
+  setState(anyAudioPlaying() ? 'playing' : 'paused');
 })();
 </script>
 </body>
