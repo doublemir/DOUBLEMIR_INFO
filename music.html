@@ -721,6 +721,11 @@ getAllTracks().forEach(track => {
     audio.addEventListener('timeupdate', syncPosition);
     audio.addEventListener('seeked', syncPosition);
     syncPosition();
+ // Принудительно обновляем состояние после смены трека
+    setTimeout(() => {
+      const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
+      navigator.mediaSession.playbackState = anyPlaying ? 'playing' : 'paused';
+    }, 100);
   }
 
   document.querySelectorAll('.track').forEach(track => {
