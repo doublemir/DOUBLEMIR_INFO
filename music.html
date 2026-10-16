@@ -697,21 +697,27 @@ getAllTracks().forEach(track => {
     } catch (e) {}
 
     // --- Синхронизация play/pause и позиции ---
-    function syncState() {
-      navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
+      function syncState() {
+      // Смотрим, играет ли ХОТЬ ОДИН трек на странице
+      const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
+      navigator.mediaSession.playbackState = anyPlaying ? 'playing' : 'paused';
     }
+
     function syncPosition() {
       if (!('setPositionState' in navigator.mediaSession)) return;
-      if (!audio.duration || !isFinite(audio.duration)) return;
+
+      // Берём трек, который РЕАЛЬНО играет сейчас
+      const playing = [...document.querySelectorAll('audio')].find(a => !a.paused);
+      if (!playing || !playing.duration || !isFinite(playing.duration)) return;
+
       try {
         navigator.mediaSession.setPositionState({
-          duration: audio.duration,
-          playbackRate: audio.playbackRate,
-          position: Math.min(audio.currentTime, audio.duration)
+          duration: playing.duration,
+          playbackRate: playing.playbackRate,
+          position: Math.min(playing.currentTime, playing.duration)
         });
       } catch (e) {}
     }
-
     audio.addEventListener('play',  syncState);
     audio.addEventListener('pause', syncState);
     audio.addEventListener('timeupdate', syncPosition);
