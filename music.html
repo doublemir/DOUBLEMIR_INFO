@@ -819,24 +819,50 @@ getAllTracks().forEach(track => {
 (function () {
   if (!('mediaSession' in navigator)) return;
 
-  function refreshState() {
-    const anyPlaying = [...document.querySelectorAll('audio')].some(a => !a.paused);
-    const next = anyPlaying ? 'playing' : 'paused';
-    if (navigator.mediaSession.playbackState !== next) {
-      navigator.mediaSession.playbackState = next;
+  function anyAudioPlaying() {
+    return [...document.querySelectorAll('audio')].some(a => !a.paused);
+  }
+
+  function setState(state) {
+    if (navigator.mediaSession.playbackState !== state) {
+      navigator.mediaSession.playbackState = state;
     }
   }
 
-  // события — срабатывают мгновенно
-  document.addEventListener('play',  refreshState, true);
-  document.addEventListener('pause', refreshState, true);
-  document.addEventListener('ended', refreshState, true);
+  // play: ставим 'playing' СРАЗУ и ещё раз через 0 мс — никаких задержек
+  document.addEventListener('play', (e) => {
+    if (e.target && e.target.tagName === 'AUDIO') {
+      setState('playing');
+      setTimeout(() => setState('playing'), 0);
+      setTimeout(() => setState('playing'), 50);
+      setTimeout(() => setState('playing'), 150);
+    }
+  }, true);
 
-  // ПЛЮС поллинг каждые 500 мс — гарантия на iOS
-  setInterval(refreshState, 500);
+  // pause: ставим 'paused' ТОЛЬКО если больше никто не играет
+  document.addEventListener('pause', (e) => {
+    if (e.target && e.target.tagName === 'AUDIO') {
+      setTimeout(() => {
+        if (!anyAudioPlaying()) setState('paused');
+      }, 50);
+    }
+  }, true);
 
-  // сразу после загрузки
-  refreshState();
+  // ended: аналогично pause
+  document.addEventListener('ended', (e) => {
+    if (e.target && e.target.tagName === 'AUDIO') {
+      setTimeout(() => {
+        if (!anyAudioPlaying()) setState('paused');
+      }, 50);
+    }
+  }, true);
+
+  // Страховочный поллинг — если что-то пропустилось
+  setInterval(() => {
+    setState(anyAudioPlaying() ? 'playing' : 'paused');
+  }, 500);
+
+  setState(anyAudioPlaying() ? 'playing' : 'paused');
 })();
 </script>
 </body>
