@@ -76,8 +76,13 @@
     </h1>
 
     <!-- ТАЙМЕР ДО РЕЛИЗА -->
-   <div class="release-timer released" id="releaseTimer">
-  <span class="release-out-now">SEE YOU SOON · НОВЫЙ РЕЛИЗ СКОРО</span>
+  <div class="release-timer" id="releaseTimer">
+  <span class="release-timer-label">До релиза · 30.10</span>
+  <span class="release-timer-sep"></span>
+  <span class="timer-unit"><b id="tDays">00</b><i>д</i></span>
+  <span class="timer-unit"><b id="tHours">00</b><i>ч</i></span>
+  <span class="timer-unit"><b id="tMinutes">00</b><i>м</i></span>
+  <span class="timer-unit"><b id="tSeconds">00</b><i>с</i></span>
 </div>
     <p>Российский рэп-исполнитель</p>
     <a href="music.html" class="btn">Слушать</a>   
@@ -737,7 +742,6 @@ function shareTrack(trackName) {
 })();
 </script>
 <script>
-<script>
 /* ---------- ТАЙМЕР ДО РЕЛИЗА ---------- */
 (function () {
   const wrap = document.getElementById('releaseTimer');
@@ -748,26 +752,18 @@ function shareTrack(trackName) {
   const mEl = document.getElementById('tMinutes');
   const sEl = document.getElementById('tSeconds');
 
-  function getReleaseDate() {
-    const now = new Date();
-    let year = now.getFullYear();
-    let target = new Date(year, 9, 16, 0, 0, 0);
-    if (target.getTime() <= now.getTime()) {
-      target = new Date(year + 1, 9, 16, 0, 0, 0);
-    }
-    return target;
-  }
+  if (!dEl || !hEl || !mEl || !sEl) return;
 
-  let releaseDate = getReleaseDate();
+  // 30 октября 2026, 00:00 (месяц 9 = октябрь, месяцы считаются с нуля)
+  const releaseDate = new Date(2026, 9, 30, 0, 0, 0);
+  const FINAL_TEXT = 'SEE YOU SOON · НОВЫЙ РЕЛИЗ СКОРО';
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
-  // Показываем финальную надпись вместо отсчёта
   function showReleased() {
     clearInterval(timerId);
     wrap.classList.add('released');
-    wrap.innerHTML =
-      '<span class="release-out-now">SEE YOU SOON · НОВЫЙ РЕЛИЗ СКОРО</span>';
+    wrap.innerHTML = '<span class="release-out-now">' + FINAL_TEXT + '</span>';
   }
 
   function tick() {
@@ -784,7 +780,7 @@ function shareTrack(trackName) {
     sEl.textContent = pad(Math.floor((diff % 60000) / 1000));
   }
 
-  let timerId = setInterval(tick, 1000);
+  const timerId = setInterval(tick, 1000);
   tick();
 })();
 </script>
