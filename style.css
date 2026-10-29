@@ -1510,3 +1510,20 @@ body.hacking {
     line-height: 1.4;
   }
 }
+/* ---------- 3D-ЭФФЕКТ ДЛЯ КАРТОЧЕК ---------- */
+.album-card, .track {
+  /* Плавный возврат в исходное положение */
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+              box-shadow 0.3s ease, 
+              border-color 0.25s ease;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+/* Отключаем эффект на телефонах (там нет мышки) */
+@media (max-width: 768px) {
+  .album-card, .track {
+    transform: none !important;
+    transition: none !important;
+  }
+}
