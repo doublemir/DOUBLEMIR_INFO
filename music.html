@@ -252,9 +252,9 @@
       </div>
     </div>
  <div class="tracklist">
-      <div class="track" id="Trap-Baby" data-cover="imgsingles/Trap-Baby.jpg">
+      <div class="track" id="trap-baby" data-cover="imgsingles/trap-baby.jpg">
         <p class="track-title">D-EY feat. DOUBLEMIR — Trap Baby<span class="explicit">E</span></p>
-        <p class="track-plays" data-plays-for="Trap-Baby"></p>
+        <p class="track-plays" data-plays-for="trap-baby"></p>
         <div class="eq"><span></span><span></span><span></span><span></span></div>
         <audio controls preload="none"><source src="audio1/trap-baby.mp3" type="audio/mpeg"></audio>
 <a href="audio1/trap-baby.mp3" download="D-EY feat. DOUBLEMIR — Trap Baby.mp3" class="download-btn">⬇ Скачать MP3</a>
@@ -379,28 +379,17 @@
 
 <!-- СКРИПТЫ -->
 <script>
- const players = document.querySelectorAll('audio');
-players.forEach(player => {
-  player.addEventListener('play', () => {
-    players.forEach(other => {
-      if (other !== player) {
-        other.pause();
-        other.currentTime = 0;
-      }
+  const players = document.querySelectorAll('audio');
+  players.forEach(player => {
+    player.addEventListener('play', () => {
+      players.forEach(other => {
+        if (other !== player && !other.paused) {
+          other.pause();
+          other.currentTime = 0;
+        }
+      });
     });
-
-    // iOS-фикс: полная переинициализация MediaSession
-    if ('mediaSession' in navigator) {
-      try { navigator.mediaSession.playbackState = 'none'; } catch(e) {}
-      setTimeout(() => {
-        try { navigator.mediaSession.playbackState = 'playing'; } catch(e) {}
-      }, 400);
-      setTimeout(() => {
-        try { navigator.mediaSession.playbackState = 'playing'; } catch(e) {}
-      }, 900);
-    }
   });
-});
 </script>
 
 <script>
@@ -749,24 +738,42 @@ getAllTracks().forEach(track => {
   });
 })();
 
+  /* ---------- ПОДЕЛИТЬСЯ ТРЕКОМ (ВСЕ ТРЕКИ) ---------- */
   function shareTrack(trackName) {
     const anchorMap = {
-      'Наебал': 'naebal',
-      'Пантера': 'pantera',
-      'Похуй ваще': 'pohuy-vashe',
-      'Секс по телефону': 'sex-phone',
-      'Bad Star': 'bad-star',
-      'YMIP feat. DOUBLEMIR — only SEX': 'only-sex',
-      'W double, DOUBLEMIR — clean girl': 'clean-girl',
-      'DOUBLEMIR, PLOHOYTARASIK — PROJECT X': 'project-x',
-      'DOUBLEMIR feat. stepanenko — Взгляды под луной': 'vzglyady',
-      'Лабубу': 'labubu',
-      'Жизнь моя': 'zhizn-moya',
-      'Будешь со мной': 'budes-so-mnoy',
-      'Боль': 'bol',
-      'Блондинка': 'blondinka',
-      'АйАйАй': 'ay-ay-ay',
-      '2026': '2026'
+      'Девочка мечты(intro)': 'devochka-mechty',
+      'Мне похуй':            'mne-poxyi',
+      'Pull Up':              'pull-up',
+      'Егермейстер':          'jagermeister',
+      'Доля правды':          'dolya-pravdy',
+      'Наебал':               'naebal',
+      'Пантера':              'pantera',
+      'Похуй ваще':           'pohuy-vashe',
+      'Секс по телефону':     'sex-phone',
+      'Bad Star':             'bad-star',
+      'Влиятельный':          'vliyatelny',
+      'Треп хата':            'trap-hata',
+      'Yau':                  'yau',
+      'HAHAHA':               'hahaha',
+      'USA MONEY':            'usa-money',
+      'МОДЕЛЬ':               'model',
+      'Флоронсе':             'floronce',
+      'Это я':                'eto-ya',
+      'Bonus':                'bonus',
+      'Точка':                'tochka',
+      'D-EY feat. DOUBLEMIR — Trap Baby':             'trap-baby',
+      'Стерва':                                       'sterva',
+      'YMIP feat. DOUBLEMIR — only SEX':              'only-sex',
+      'W double, DOUBLEMIR — clean girl':             'clean-girl',
+      'DOUBLEMIR, PLOHOYTARASIK — PROJECT X':         'project-x',
+      'DOUBLEMIR feat. stepanenko — Взгляды под луной':'vzglyady',
+      'Лабубу':                                       'labubu',
+      'Жизнь моя':                                    'zhizn-moya',
+      'Будешь со мной':                               'budes-so-mnoy',
+      'Боль':                                         'bol',
+      'Блондинка':                                    'blondinka',
+      'АйАйАй':                                       'ay-ay-ay',
+      '2026':                                         '2026'
     };
     const anchor = anchorMap[trackName] || '';
     const baseUrl = window.location.origin + window.location.pathname;
@@ -883,6 +890,35 @@ getAllTracks().forEach(track => {
 
   setState(anyAudioPlaying() ? 'playing' : 'paused');
 })();
+</script>
+<script>
+/* ---------- СКРОЛЛ К ТРЕКУ ПО ССЫЛКЕ ---------- */
+window.addEventListener('load', () => {
+  // Проверяем, есть ли в ссылке решетка (например, #trap-baby)
+  if (window.location.hash) {
+    const id = window.location.hash.substring(1); // убираем решетку
+    const trackElement = document.getElementById(id);
+
+    if (trackElement) {
+      // Ждем 600 мс, чтобы отработали твои старые скрипты (которые кидают наверх)
+      // и чтобы успели подгрузиться картинки, иначе страница дернется.
+      setTimeout(() => {
+        trackElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Красиво подсвечиваем трек, чтобы было видно, куда привела ссылка
+        trackElement.style.transition = 'box-shadow 0.3s, border-color 0.3s';
+        trackElement.style.boxShadow = '0 0 30px rgba(200, 255, 0, 0.6)';
+        trackElement.style.borderColor = '#c8ff00';
+        
+        // Убираем подсветку через 2.5 секунды
+        setTimeout(() => {
+          trackElement.style.boxShadow = '';
+          trackElement.style.borderColor = '';
+        }, 2500);
+      }, 600); // Задержка 600мс обязательна!
+    }
+  }
+});
 </script>
 </body>
 </html>
