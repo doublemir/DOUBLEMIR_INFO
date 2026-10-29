@@ -1,0 +1,21 @@
+{
+  "name": "DOUBLEMIR INFO",
+  "short_name": "DOUBLEMIR",
+  "description": "Официальный сайт артиста DOUBLEMIR",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#c8ff00",
+  "icons": [
+    {
+      "src": "imgicon/icon1.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "imgicon/icon2.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
