@@ -2,7 +2,7 @@
   "name": "DOUBLEMIR INFO",
   "short_name": "DOUBLEMIR",
   "description": "Официальный сайт артиста DOUBLEMIR",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#c8ff00",
