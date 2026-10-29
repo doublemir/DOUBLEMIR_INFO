@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublemir-pwa-v2';
+const CACHE_NAME = 'doublemir-pwa-v3';
 const urlsToCache = [
   '/',
   '/index.html',
