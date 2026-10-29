@@ -784,5 +784,40 @@ function shareTrack(trackName) {
   tick();
 })();
 </script>
+<script>
+/* ---------- 3D НАКЛОН КАРТОЧЕК ---------- */
+document.querySelectorAll('.album-card, .track').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    // Проверка: если экран маленький, не наклоняем
+    if (window.innerWidth < 768) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left; 
+    const y = e.clientY - rect.top;  
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    // Угол наклона (10 градусов максимум)
+    const rotateX = ((y - centerY) / centerY) * -10; 
+    const rotateY = ((x - centerX) / centerX) * 10;
+    
+    // Применяем наклон. Важно: убираем transition на время движения
+    card.style.transition = 'none'; 
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+    
+    // Добавляем красивую тень при наклоне
+    card.style.boxShadow = `0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(200, 255, 0, 0.15)`;
+  });
+
+  card.addEventListener('mouseleave', () => {
+    if (window.innerWidth < 768) return;
+
+    // Возвращаем всё обратно. Возвращаем transition, чтобы было плавно
+    card.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease';
+    card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
+    card.style.boxShadow = ''; // Сбрасываем тень
+  });
+});
+</script>
 </body>
 </html>
