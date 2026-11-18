@@ -1527,13 +1527,22 @@ body.hacking {
     transition: none !important;
   }
 }
-/* ---------- НЕОНОВОЕ ПЕРЕЛИВАНИЕ ДЛЯ ТЕЛЕФОНОВ ---------- */
+/* ---------- ПЛАВНОЕ ПОЯВЛЕНИЕ + ПЕРЕЛИВАНИЕ ДЛЯ ТЕЛЕФОНОВ ---------- */
 @media (max-width: 768px) {
   .animated-title span {
-    opacity: 1 !important; /* ⬅️ ВОТ ЭТА СТРОЧКА ВЕРНЕТ ТЕКСТ */
-    transform: none !important; 
-    animation: neonWave 3s ease-in-out infinite alternate;
-    animation-delay: calc(var(--i) * 0.15s);
+    /* 1. Сбрасываем то, что мешало */
+    opacity: 0;
+    transform: translateY(40px);
+    
+    /* 2. Запускаем ДВЕ анимации: сначала выпрыгивание (letterUp), потом переливание (neonWave) */
+    animation: 
+      letterUp 0.6s ease forwards,
+      neonWave 3s ease-in-out infinite alternate;
+      
+    /* 3. Задержка: сначала буквы появляются по очереди, а через 0.6 сек начинается волна */
+    animation-delay: 
+      calc(var(--i) * 0.08s), 
+      calc(var(--i) * 0.08s + 0.6s);
   }
 
   @keyframes neonWave {
