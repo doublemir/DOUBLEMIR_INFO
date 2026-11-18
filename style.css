@@ -1527,3 +1527,29 @@ body.hacking {
     transition: none !important;
   }
 }
+/* ---------- НЕОНОВОЕ ПЕРЕЛИВАНИЕ ДЛЯ ТЕЛЕФОНОВ ---------- */
+@media (max-width: 768px) {
+  .animated-title span {
+    /* Отключаем магнитный эффект на телефоне, чтобы не мешал */
+    transform: none !important; 
+    /* Запускаем анимацию волны */
+    animation: neonWave 3s ease-in-out infinite alternate;
+    /* Задержка для каждой буквы, чтобы шла волна (используем переменную --i) */
+    animation-delay: calc(var(--i) * 0.15s);
+  }
+
+  @keyframes neonWave {
+    0% {
+      color: #fff;
+      text-shadow: none;
+    }
+    50% {
+      color: #c8ff00; /* Твой неоновый цвет */
+      text-shadow: 0 0 15px rgba(200, 255, 0, 0.6), 0 0 30px rgba(200, 255, 0, 0.3);
+    }
+    100% {
+      color: #fff;
+      text-shadow: none;
+    }
+  }
+}
