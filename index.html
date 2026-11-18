@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 <!-- ПАСХАЛКА: ВЗЛОМ САЙТА -->
@@ -754,7 +754,7 @@ function shareTrack(trackName) {
 
   if (!dEl || !hEl || !mEl || !sEl) return;
 
-  // 30 октября 2026, 00:00 (месяц 10 = ноябрь, месяцы считаются с нуля)
+  // 20 ноября 2026, 00:00 (месяц 10 = ноябрь, месяцы считаются с нуля)
   const releaseDate = new Date(2026, 10, 20, 0, 0, 0);
   const FINAL_TEXT = 'SEE YOU SOON · НОВЫЙ РЕЛИЗ СКОРО';
 
@@ -817,6 +817,63 @@ document.querySelectorAll('.album-card, .track').forEach(card => {
     card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
     card.style.boxShadow = ''; // Сбрасываем тень
   });
+});
+</script>
+<script>
+/* ---------- МАГНИТНЫЙ ЭФФЕКТ ДЛЯ ЗАГОЛОВКА ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  const title = document.querySelector('.animated-title');
+  if (!title) return;
+  
+  const spans = title.querySelectorAll('span');
+
+  // Ждем, пока закончится анимация появления букв (1.5 сек)
+  setTimeout(() => {
+    // Добавляем плавность для возврата на место
+    spans.forEach(span => {
+      span.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s, text-shadow 0.3s';
+    });
+
+    title.addEventListener('mousemove', (e) => {
+      const rect = title.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      spans.forEach(span => {
+        const spanRect = span.getBoundingClientRect();
+        const spanX = spanRect.left - rect.left + spanRect.width / 2;
+        const spanY = spanRect.top - rect.top + spanRect.height / 2;
+
+        const distX = mouseX - spanX;
+        const distY = mouseY - spanY;
+        const distance = Math.sqrt(distX * distX + distY * distY);
+        
+        const maxDist = 120; // Радиус действия магнита (в пикселях)
+
+        if (distance < maxDist) {
+          const force = (maxDist - distance) / maxDist;
+          const moveX = (distX / distance) * force * 20; // Отталкивание по X
+          const moveY = (distY / distance) * force * 20; // Отталкивание по Y
+          
+          span.style.transform = `translate(${-moveX}px, ${-moveY}px) scale(${1 + force * 0.15})`;
+          span.style.color = '#c8ff00';
+          span.style.textShadow = '0 0 20px rgba(200, 255, 0, 0.6)';
+        } else {
+          span.style.transform = '';
+          span.style.color = '';
+          span.style.textShadow = '';
+        }
+      });
+    });
+
+    title.addEventListener('mouseleave', () => {
+      spans.forEach(span => {
+        span.style.transform = '';
+        span.style.color = '';
+        span.style.textShadow = '';
+      });
+    });
+  }, 1500); // Задержка, чтобы не конфликтовать с появлением
 });
 </script>
 </body>
